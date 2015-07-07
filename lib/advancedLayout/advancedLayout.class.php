@@ -45,7 +45,7 @@ class AdvancedLayout{
     
     ksort($modules_poly);
     
-    if($return_polymorphism && count($modules_poly_array)){
+    if($return_polymorphism){
       foreach($modules_poly_array AS $route=>$module){
         foreach($modules_poly_array[$route]['polymorphism']['actions'] AS $i=>$po){
           $modules_poly_array[$route]['polymorphism']['actions'][$i] = $modules_array[$po];

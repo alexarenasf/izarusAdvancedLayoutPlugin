@@ -30,5 +30,4 @@
     'delete_title'=>'Eliminar %option.singular%',
     'new'=>'Debe guardar para agregar %option.plural%'
   ),
-  'call_js_function'=>'load_matrix',
 )) ?>
