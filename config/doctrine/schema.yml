@@ -1,0 +1,51 @@
+ #######################################################
+# Plugin: izarusAdvancedLayoutPlugin
+# Version: 0.1
+# Actualizado: 28/06/2015
+# Autor: Alex Arenas Fuentes
+#######################################################
+
+sfGuardPermission:
+  columns:
+    modules:                  { type: string }
+    enable_advanced:          { type: boolean, default: true }
+
+ModulesPolymorphism:
+  columns:
+    source:                   { type: string, size: 255 }
+    sf_guard_permission_id:   { type: integer, notnull: true }
+    destination:              { type: string, size: 255 }
+    use_destination_title:    { type: boolean, default: true }
+  relations:
+    Permission:               { class: sfGuardPermission, local: sf_guard_permission_id, foreign: id, onDelete: CASCADE } 
+    
+LateralMenu:
+  columns:
+    menu_order:               { type: integer, default: 0 }
+    title:                    { type: string, size: 100 }
+    modules:                  { type: string }
+  relations:
+    Permissions:              { class: sfGuardPermission, refClass: LateralMenuPermissions }
+    
+LateralMenuPermissions:
+  columns:
+    sf_guard_permission_id:   { type: integer, notnull: true }
+    lateral_menu_id:          { type: integer, notnull: true }
+  relations:
+    Permission:               { class: sfGuardPermission, local: sf_guard_permission_id, foreign: id, onDelete: CASCADE } 
+    LateralMenu:              { onDelete: CASCADE }
+    
+TopMenu:
+  columns:
+    title:                    { type: string, size: 100 }
+    modules:                  { type: string }
+  relations:
+    Permissions:              { class: sfGuardPermission, refClass: TopMenuPermissions }
+    
+TopMenuPermissions:
+  columns:
+    sf_guard_permission_id:   { type: integer, notnull: true }
+    top_menu_id:              { type: integer, notnull: true }
+  relations:
+    Permission:               { class: sfGuardPermission, local: sf_guard_permission_id, foreign: id, onDelete: CASCADE } 
+    TopMenu:                  { onDelete: CASCADE }

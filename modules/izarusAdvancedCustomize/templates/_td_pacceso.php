@@ -1,0 +1,1 @@
+<?php echo ($guard_permission->getEnableAdvanced())?'Si':'No'; ?>

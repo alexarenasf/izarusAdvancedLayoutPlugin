@@ -1,0 +1,1 @@
+<?php echo count(json_decode($sf_data->getRaw('guard_permission')->getModules())); ?>

@@ -1,0 +1,1 @@
+<?php echo count($guard_permission->getUsers()); ?>
