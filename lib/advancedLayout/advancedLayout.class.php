@@ -18,22 +18,24 @@ class AdvancedLayout{
           $layout_info = $modules_dir.DIRECTORY_SEPARATOR.$lectura.DIRECTORY_SEPARATOR.'config/layout.yml';
           if(file_exists($layout_info)){
             foreach(sfYaml::load($layout_info) AS $action=>$m){
-              if(isset($m['polymorphism'])){                
-                foreach($m['polymorphism']['actions'] AS $i=>$a)
-                  $m['polymorphism']['actions'][$i] = $lectura.'/'.$a;
+              if(isset($m['title']) && isset($m['icon'])){
+                if(isset($m['polymorphism'])){                
+                  foreach($m['polymorphism']['actions'] AS $i=>$a)
+                    $m['polymorphism']['actions'][$i] = $lectura.'/'.$a;
+                  
+                  $m['polymorphism']['default_route'] = $lectura.'/'.$m['polymorphism']['default'];
+                  
+                }
                 
-                $m['polymorphism']['default_route'] = $lectura.'/'.$m['polymorphism']['default'];
+                $m['route'] = $lectura.'/'.$action;
                 
-              }
-              
-              $m['route'] = $lectura.'/'.$action;
-              
-              $modules[$m['title']] = $lectura.'/'.$action;
-              $modules_array[$lectura.'/'.$action] = $m;
+                $modules[$m['title']] = $lectura.'/'.$action;
+                $modules_array[$lectura.'/'.$action] = $m;
 
-              if($return_polymorphism && isset($m['polymorphism'])){
-                $modules_poly_array[$lectura.'/'.$action] = $m;
-                $modules_poly[$m['title']] = $lectura.'/'.$action;
+                if($return_polymorphism && isset($m['polymorphism'])){
+                  $modules_poly_array[$lectura.'/'.$action] = $m;
+                  $modules_poly[$m['title']] = $lectura.'/'.$action;
+                }
               }
             }
           }
@@ -119,7 +121,9 @@ class AdvancedLayout{
     $layout_info = sfContext::getInstance()->getModuleDirectory().DIRECTORY_SEPARATOR.'config/layout.yml';
     if(file_exists($layout_info)){
       $yaml = sfYaml::load($layout_info);
-      if(!isset($yaml[$action]) && isset($yaml['index']))
+      if(isset($yaml[$action]) && isset($yaml[$action]['use_permission']) && isset($yaml[$yaml[$action]['use_permission']]))
+        $action = $yaml[$action]['use_permission'];
+      elseif(!isset($yaml[$action]) && isset($yaml['index']))
         $action = 'index';
     }
     
