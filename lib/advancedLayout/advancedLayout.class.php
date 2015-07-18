@@ -296,4 +296,15 @@ class AdvancedLayout{
     echo '</title>';
   }
   
+  public static function current_route($route){
+    $modules = self::getModules('',false);
+    $module = sfContext::getInstance()->getModuleName();
+    $action = sfContext::getInstance()->getActionName();
+
+    if(!isset($modules[$module.'/'.$action]))
+      $action = 'index';
+
+    return ($module.'/'.$action == $route);
+  }
+  
 }
