@@ -117,10 +117,10 @@ class AdvancedLayout{
     
     $module = sfContext::getInstance()->getModuleName();
     $action = sfContext::getInstance()->getActionName();
-    
+       
     $layout_info = sfContext::getInstance()->getModuleDirectory().DIRECTORY_SEPARATOR.'config/layout.yml';
     if(file_exists($layout_info)){
-      $yaml = sfYaml::load($layout_info);
+      $yaml = sfYaml::load($layout_info);      
       if(isset($yaml[$action]) && isset($yaml[$action]['use_permission']) && isset($yaml[$yaml[$action]['use_permission']]))
         $action = $yaml[$action]['use_permission'];
       elseif(!isset($yaml[$action]) && isset($yaml['index']))
@@ -299,11 +299,20 @@ class AdvancedLayout{
   public static function current_route($route){
     $modules = self::getModules('',false);
     $module = sfContext::getInstance()->getModuleName();
-    $action = sfContext::getInstance()->getActionName();
-
+    $action = sfContext::getInstance()->getUser()->getAttribute('polymodule')?sfContext::getInstance()->getUser()->getAttribute('original_action'):sfContext::getInstance()->getActionName();
+      
+    $layout_info = sfContext::getInstance()->getModuleDirectory().DIRECTORY_SEPARATOR.'config/layout.yml';
+    if(file_exists($layout_info)){
+      $yaml = sfYaml::load($layout_info);      
+      if(isset($yaml[$action]) && isset($yaml[$action]['use_permission']) && isset($yaml[$yaml[$action]['use_permission']]))
+        $action = $yaml[$action]['use_permission'];
+      elseif(!isset($yaml[$action]) && isset($yaml['index']))
+        $action = 'index';
+    }
+    
     if(!isset($modules[$module.'/'.$action]))
       $action = 'index';
-
+      
     return ($module.'/'.$action == $route);
   }
   
