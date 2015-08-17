@@ -19,12 +19,14 @@ class AdvancedLayout{
           if(file_exists($layout_info)){
             foreach(sfYaml::load($layout_info) AS $action=>$m){
               if(isset($m['title']) && isset($m['icon'])){
-                if(isset($m['polymorphism'])){                
-                  foreach($m['polymorphism']['actions'] AS $i=>$a)
-                    $m['polymorphism']['actions'][$i] = $lectura.'/'.$a;
-                  
-                  $m['polymorphism']['default_route'] = $lectura.'/'.$m['polymorphism']['default'];
-                  
+                if(isset($m['polymorphism'])){
+                  if(!isset($m['polymorphism']['global']) || (isset($m['polymorphism']['global']) && $m['polymorphism']['global']!='true')){
+                    foreach($m['polymorphism']['actions'] AS $i=>$a)
+                      $m['polymorphism']['actions'][$i] = $lectura.'/'.$a;
+                    $m['polymorphism']['default_route'] = $lectura.'/'.$m['polymorphism']['default'];
+                  }else{
+                    $m['polymorphism']['default_route'] = $m['polymorphism']['default'];
+                  }
                 }
                 
                 $m['route'] = $lectura.'/'.$action;
@@ -117,10 +119,10 @@ class AdvancedLayout{
     
     $module = sfContext::getInstance()->getModuleName();
     $action = sfContext::getInstance()->getActionName();
-    
+       
     $layout_info = sfContext::getInstance()->getModuleDirectory().DIRECTORY_SEPARATOR.'config/layout.yml';
     if(file_exists($layout_info)){
-      $yaml = sfYaml::load($layout_info);
+      $yaml = sfYaml::load($layout_info);      
       if(isset($yaml[$action]) && isset($yaml[$action]['use_permission']) && isset($yaml[$yaml[$action]['use_permission']]))
         $action = $yaml[$action]['use_permission'];
       elseif(!isset($yaml[$action]) && isset($yaml['index']))
@@ -183,6 +185,15 @@ class AdvancedLayout{
         'use_title'=>$mp->getUseDestinationTitle(),
       );
     }else if(isset($modules_polymorfism[$route]['polymorphism']['default'])){
+      if(isset($modules_polymorfism[$route]['polymorphism']['global']) && $modules_polymorfism[$route]['polymorphism']['global']=='true'){
+        $global = explode('/',$modules_polymorfism[$route]['polymorphism']['default']);
+        return array(
+          'module'=>$global[0],
+          'action'=>$global[1],
+          'use_title'=>false,
+        );
+      }
+    
       return array(
         'module'=>$module,
         'action'=>$modules_polymorfism[$route]['polymorphism']['default'],
@@ -299,11 +310,20 @@ class AdvancedLayout{
   public static function current_route($route){
     $modules = self::getModules('',false);
     $module = sfContext::getInstance()->getModuleName();
-    $action = sfContext::getInstance()->getActionName();
-
+    $action = sfContext::getInstance()->getUser()->getAttribute('polymodule')?sfContext::getInstance()->getUser()->getAttribute('original_action'):sfContext::getInstance()->getActionName();
+      
+    $layout_info = sfContext::getInstance()->getModuleDirectory().DIRECTORY_SEPARATOR.'config/layout.yml';
+    if(file_exists($layout_info)){
+      $yaml = sfYaml::load($layout_info);      
+      if(isset($yaml[$action]) && isset($yaml[$action]['use_permission']) && isset($yaml[$yaml[$action]['use_permission']]))
+        $action = $yaml[$action]['use_permission'];
+      elseif(!isset($yaml[$action]) && isset($yaml['index']))
+        $action = 'index';
+    }
+    
     if(!isset($modules[$module.'/'.$action]))
       $action = 'index';
-
+      
     return ($module.'/'.$action == $route);
   }
   
