@@ -17,6 +17,7 @@ class advancedLayoutFilter extends sfFilter
       
       if(AdvancedLayout::isModuleAdvanced()){
         $action = $this->getContext()->getActionName(); 
+        
         if(!$profile && $action <> 'selectProfile'){
           $this->getContext()->getController()->forward('izarusAdvancedCustomize','selectProfile');
           throw new sfStopException();
@@ -24,12 +25,15 @@ class advancedLayoutFilter extends sfFilter
           $polymorfism = AdvancedLayout::modulePolymorfism();
           
           if(!AdvancedLayout::userHasPermission()){
+            $this->getContext()->getUser()->setAttribute('polymodule',false);
             $this->getContext()->getController()->forward('izarusAdvancedCustomize','forbidden');
             throw new sfStopException();
           }else if($polymorfism!==false){
+            $this->getContext()->getUser()->setAttribute('polymodule',true);
             $this->getContext()->getController()->forward($polymorfism['module'],$polymorfism['action']);
             throw new sfStopException();
-          }        
+          }
+          $this->getContext()->getUser()->setAttribute('polymodule',false);          
         }   
       }
     }
